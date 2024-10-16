@@ -1,0 +1,4 @@
+.ipynb_checkpoints/
+__pycache__/
+htmls/
+data/Municipios_IGN.geojson
