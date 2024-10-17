@@ -25,7 +25,7 @@ Note: to run the scripts, one needs the authentication Strava information. See [
 Two main scripts are provided:
 
 - `StravaStats.ipynb` loads the activities from the Strava API and computes several statistics and visualizes the activties over a time period.
-- `StravaMap.ipynb` loads the activities' gps data from the Strava API and visualize the routes in a map, together with the municipalities which includes those routes.
+- `StravaMap.ipynb` loads the activities' gps data from the Strava API and visualize the routes in a map, together with the municipalities where these activities take place.
 
 ## To do
 
@@ -34,8 +34,9 @@ Planned tasks for the future:
 - [x] Improve Eddington number plot
 - [x] Efficient GPS import routine
 - [x] Efficient municipalities routine
+- [x] Include other non-spanish regions
+- [ ] Improve visualization in web
 - [ ] Reorganize code better
 - [ ] Improve how to store `acts_gps` using geopandas
-- [ ] Improve to include other non-spanish regions
 - [ ] Route and region info when hover
 - [ ] Compute cluster of municipalities

@@ -1,4 +1,5 @@
 .ipynb_checkpoints/
 __pycache__/
 htmls/
-data/Municipios_IGN.geojson
+data/municipalities_all.geojson
+payload.json

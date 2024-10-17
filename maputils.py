@@ -4,9 +4,9 @@ import geopandas as gpd
 from shapely.geometry import Point
 from geopandas.tools import sjoin
 import folium
-from folium.plugins import Geocoder, Draw
+from folium.plugins import Geocoder
 
-
+# Custom popup to include in the map
 def create_popup(name,dist,time,elevation,date):
     
     popup = "<b>"+ name +"</b>"
@@ -14,6 +14,7 @@ def create_popup(name,dist,time,elevation,date):
     
     return popup
 
+# Create folium map to render routes and regions
 def create_map(data_acts, data_names, municipis_data):
     
     mean_lat, mean_lon = tuple(np.median(np.array([np.median(data[['lat', 'long']].to_numpy(),0) for data in data_acts]),0))
@@ -37,7 +38,6 @@ def create_map(data_acts, data_names, municipis_data):
         location=[mean_lat, mean_lon],
         zoom_start=12,
         tiles=tileset_list[0],
-        tooltip = 'This tooltip will appear on hover'
         #width=1024,
         #height=600
     )
@@ -46,18 +46,17 @@ def create_map(data_acts, data_names, municipis_data):
     for tile in tileset_list[1:]:
         tile.add_to(route_map)
 
-    rutas = folium.FeatureGroup(name='Rutes').add_to(route_map)
+    # Include municipilaties
+    tooltip = folium.GeoJsonTooltip(fields=["name"],aliases=["Municipality"])
+    folium.GeoJson(data=municipis_data,name="Municipis",show=True,tooltip=tooltip,style_function=lambda feature: {"weight": 1}).add_to(route_map)
+
+    # Add routes
+    routes = folium.FeatureGroup(name='Rutes').add_to(route_map)
 
     for i, data in enumerate(data_acts):
         coordinates = [tuple(x) for x in data[['lat', 'long']].to_numpy()]
         popup = create_popup(data_names.iloc[i]["name"],data_names.iloc[i]["distance"],data_names.iloc[i]["moving_time"],data_names.iloc[i]["elevation"],data_names.iloc[i]["start_time"])
-        folium.PolyLine(coordinates, weight=2, color= 'red', opacity=0.7, tooltip=popup).add_to(rutas)
-
-    # Include municipilaties
-    tooltip = folium.GeoJsonTooltip(fields=["NAMEUNIT"],aliases=["Municipality"])
-    folium.GeoJson(data=municipis_data,name="Municipis",show=True,tooltip=tooltip).add_to(route_map)
-
-    Draw(export=False).add_to(route_map)
+        folium.PolyLine(coordinates, weight=2, color= 'red', opacity=0.7, tooltip=popup).add_to(routes)
 
     Geocoder().add_to(route_map)
 
@@ -77,7 +76,7 @@ def create_map(data_acts, data_names, municipis_data):
 def get_covered_regions(coordinates):
 
     # Load the GeoJSON file with region boundaries
-    geo_df = gpd.read_file('data/Municipios_IGN.geojson')
+    geo_df = gpd.read_file('data/municipalities_all.geojson')
 
     # Create a GeoSeries of Shapely Point objects from the array of coordinates
     points = gpd.GeoSeries([Point(xy[1],xy[0]) for xy in coordinates])
