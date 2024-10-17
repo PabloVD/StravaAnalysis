@@ -2,6 +2,8 @@
 
 Analysis of the [Strava](https://www.strava.com/) activity of a user, scrapped through the [Strava API](https://developers.strava.com/) and visualized with [Folium](https://python-visualization.github.io/folium/latest/) and [Plotly](https://plotly.com/).
 
+**See an example of the results in [this website](https://pablovd.github.io/misc/strava.html).**
+
 !["Visualization example"](stravaexample.png)
 
 ## Authentication
@@ -10,11 +12,11 @@ Note: to run the scripts, one needs the authentication Strava information. See [
 
 ```json
 {
-    'client_id': "xxxx",
-    'client_secret': 'xxxx',
-    'refresh_token': 'xxxx',
-    'grant_type': "refresh_token",
-    'f': 'json'
+    "client_id": "xxxx",
+    "client_secret": "xxxx",
+    "refresh_token": "xxxx",
+    "grant_type": "refresh_token",
+    "f": "json"
 }
 ```
 
