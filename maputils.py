@@ -18,40 +18,44 @@ def create_map(data_acts, data_names, municipis_data):
     
     mean_lat, mean_lon = tuple(np.median(np.array([np.median(data[['lat', 'long']].to_numpy(),0) for data in data_acts]),0))
 
+    # Tilesets
     # Get more tilesets from https://leaflet-extras.github.io/leaflet-providers/preview/
-
-    # Default tileset
+    tileset_list = []
+    tileset_list.append(folium.TileLayer(tiles="OpenStreetMap",name="OpenStreetMap"))
     tileset = 'https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png'
     attr = '<a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases" title="CyclOSM - Open Bicycle render">CyclOSM</a> | Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    tileset_list.append(folium.TileLayer(tiles=tileset,attr=attr,name="CyclOSM"))
+    tileset = "http://tile.mtbmap.cz/mtbmap_tiles/{z}/{x}/{y}.png"
+    attr = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &amp; USGS'
+    tileset_list.append(folium.TileLayer(tiles=tileset,attr=attr,name="MtbMap"))
+    tileset_list.append(folium.TileLayer("Stamen Terrain",name="Stamen Terrain"))
+    tileset = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+    attr = 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    tileset_list.append(folium.TileLayer(tiles=tileset,attr=attr,name="Esri.WorldImagery"))
 
     route_map = folium.Map(
         location=[mean_lat, mean_lon],
         zoom_start=12,
-        tiles=folium.TileLayer(tiles=tileset,attr=attr,name="CyclOSM"),
+        tiles=tileset_list[0],
         tooltip = 'This tooltip will appear on hover'
         #width=1024,
         #height=600
     )
 
     # Add more optional tilesets
-    folium.TileLayer("OpenStreetMap",name="OpenStreetMap").add_to(route_map)
-    tileset = "http://tile.mtbmap.cz/mtbmap_tiles/{z}/{x}/{y}.png"
-    attr = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &amp; USGS'
-    folium.TileLayer(tiles=tileset,attr=attr,name="MtbMap").add_to(route_map)
-    folium.TileLayer("Stamen Terrain",name="Stamen Terrain").add_to(route_map)
-    tileset = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
-    attr = 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-    folium.TileLayer(tiles=tileset,attr=attr,name="Esri.WorldImagery").add_to(route_map)
+    for tile in tileset_list[1:]:
+        tile.add_to(route_map)
 
     rutas = folium.FeatureGroup(name='Rutes').add_to(route_map)
 
     for i, data in enumerate(data_acts):
         coordinates = [tuple(x) for x in data[['lat', 'long']].to_numpy()]
         popup = create_popup(data_names.iloc[i]["name"],data_names.iloc[i]["distance"],data_names.iloc[i]["moving_time"],data_names.iloc[i]["elevation"],data_names.iloc[i]["start_time"])
-        folium.PolyLine(coordinates, weight=2, color= 'red', opacity=0.7, popup=popup).add_to(rutas)
+        folium.PolyLine(coordinates, weight=2, color= 'red', opacity=0.7, tooltip=popup).add_to(rutas)
 
     # Include municipilaties
-    folium.GeoJson(data=municipis_data["geometry"],name="Municipis",show=False).add_to(route_map)
+    tooltip = folium.GeoJsonTooltip(fields=["NAMEUNIT"],aliases=["Municipality"])
+    folium.GeoJson(data=municipis_data,name="Municipis",show=True,tooltip=tooltip).add_to(route_map)
 
     Draw(export=False).add_to(route_map)
 

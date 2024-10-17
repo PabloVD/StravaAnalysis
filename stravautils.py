@@ -251,6 +251,7 @@ def get_gps_activities(activities, access_token, acts_gps=None, acts_info=None):
                 print(requested['message'])
                 numerrors += 1
                 if numerrors>2:
+                    print("Stopping due to request errors. Try again later...")
                     break
                 continue
 
