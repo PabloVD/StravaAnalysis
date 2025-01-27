@@ -224,20 +224,27 @@ def get_gps_activities(activities, access_token, acts_gps=None, acts_info=None):
         if id in acts_info['id'].values:
             continue
 
+        print(activities.iloc[i]["name"],activities.iloc[i]["date"])
+
         # Make API call
         url = f"https://www.strava.com/api/v3/activities/{id}/streams"
         header = {'Authorization': 'Bearer ' + access_token}
         #print(requests.get(url, headers=header, params={'keys':['latlng']}).json())
         try:
             requested = requests.get(url, headers=header, params={'keys':['latlng']}).json()
-            #print(requested)
+            if requested[0]["type"]!="latlng":
+                print("Skipping ",activities.iloc[i]["name"],", no lat long data")
+                continue
+            
             latlong = requested[0]['data']
+
             
             #time_list = requests.get(url, headers=header, params={'keys':['time']}).json()[1]['data']
             #altitude = requests.get(url, headers=header, params={'keys':['altitude']}).json()[1]['data']
 
             # Create dataframe to store data 'neatly'
             data = pd.DataFrame([*latlong], columns=['lat','long'])
+
             #data['altitude'] = altitude
             #start = datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%SZ")
             #data['time'] = [(start+timedelta(seconds=t)) for t in time_list]
