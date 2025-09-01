@@ -3,3 +3,4 @@ __pycache__/
 htmls/
 data/municipalities_all.geojson
 payload.json
+data/
